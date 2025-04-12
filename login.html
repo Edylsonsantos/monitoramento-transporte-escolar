@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="c_u.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <!-- Modal -->
+    <div id="myModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <i id="bx-car" class='bx bx-check-circle' style="display: none;"></i> <!-- Escondido por padrão -->
+            <i id="bx-x" class='bx bx-x' style="display: none;"></i> <!-- Escondido por padrão -->
+            <p id="message"></p>
+        </div>
+    </div>
+
+    <i class='bx bx-car'></i>
+    <h1 class="underline-animation">Login</h1>
+    <form id="loginForm">
+        <div>
+            <label for="numero">Número de Telefone:</label>
+            <div style="display: flex;">
+                <p class="prefixo">+258</p>
+                <input type="number" id="numero" required inputmode="numeric" pattern="^\d{9}$" title="O número deve ter 9 dígitos.">
+            </div>
+        </div>
+        <div>
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha" required>
+        </div>
+        <div class="btn">
+            <button type="submit">Entrar</button>
+            <a href="cadastro_usuario.html">Fazer registo</a>
+        </div>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const h1 = document.querySelector('.underline-animation');
+            h1.classList.add('start'); // Adiciona a classe para iniciar a animação
+        });
+
+        function openModal(icon, text) {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'flex';
+
+            const sucess = document.getElementById('bx-car');
+            const x = document.getElementById('bx-x');
+            const textMessage = document.getElementById('message');
+
+            if (icon === "success") {
+                sucess.style.display = "block"; // Mostra o ícone de sucesso
+                x.style.display = "none"; // Esconde o ícone de erro
+                textMessage.textContent = text; // Usa o texto passado como argumento
+            } else {
+                sucess.style.display = "none"; // Esconde o ícone de sucesso
+                x.style.display = "block"; // Mostra o ícone de erro
+                textMessage.textContent = text; // Usa o texto passado como argumento
+            }
+
+            // Fecha o modal após 3 segundos
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 3000);
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const numero = document.getElementById('numero').value;
+            const senha = document.getElementById('senha').value;
+
+            const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+            const usuario = usuarios.find(u => u.numero === numero && u.senha === senha);
+
+            if (usuario) {
+                openModal("success", "Login bem-sucedido!"); // Abre modal de sucesso
+                localStorage.setItem('usuarioLogado', JSON.stringify(usuario)); // Armazena o usuário logado
+                setTimeout(() => {
+                    window.location.href = 'menu.html'; // Redireciona para o cadastro de viaturas
+                }, 3000); // Redireciona após 3 segundos
+            } else {
+                openModal("error", "Número ou senha incorretos."); // Abre modal de erro
+            }
+        });
+    </script>
+</body>
+</html>

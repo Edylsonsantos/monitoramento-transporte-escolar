@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Paragens</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXziIbU_msVXwoHlXC8yOeHrdwsZTmD2E"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #map {
+            height: 300px;
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #dadosViatura {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            width: 100%;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        li {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        li .details {
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        .location-icon {
+            font-size: 24px;
+            color: #2196f3;
+        }
+
+        .date {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .coords {
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="underline-animation" id="dadosViatura"></h1>
+    
+    <div id="map"></div>
+    <ul id="listaParagens"></ul>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const placa = urlParams.get('placa');
+        const viaturas = JSON.parse(localStorage.getItem('viaturas')) || [];
+        const viatura = viaturas.find(v => v.placa === placa);
+
+        if (viatura) {
+            document.getElementById('dadosViatura').innerHTML = `HISTORICO DA VIATURA: ${viatura.nomeViatura}`;
+            initMap(viatura.historico);
+            mostrarListaParagens(viatura.historico);
+        } else {
+            alert('Viatura não encontrada!');
+        }
+
+        function initMap(historico) {
+            const quelimane = { lat: -17.878388, lng: 36.888273 };
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 13,
+                center: quelimane
+            });
+
+            historico.forEach(paragem => {
+                const position = { lat: parseFloat(paragem.latitude), lng: parseFloat(paragem.longitude) };
+                new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: `Paragem em ${paragem.data}`
+                });
+            });
+        }
+
+        function mostrarListaParagens(historico) {
+            const lista = document.getElementById('listaParagens');
+            historico.forEach(paragem => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <i class='bx bxs-map location-icon'></i>
+                    <div class="details">
+                        <p class="date">Data: ${paragem.data}</p>
+                        <p class="coords">Localização: ${paragem.latitude}, ${paragem.longitude}</p>
+                    </div>
+                `;
+                lista.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>

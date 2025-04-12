@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página do Usuário</title>
+    <link href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card i {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #2196f3;
+        }
+
+        .card-title {
+            font-size: 16px;
+            color: #333;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+    <h1>Menu de Opções</h1>
+    <div class="card-container" id="cardContainer"></div>
+
+    <script>
+        // Obtendo o usuário logado do LocalStorage
+        const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+
+        // Verificando se o usuário é um motorista
+        const isMotorista = usuarioLogado && usuarioLogado.tipo === 'motorista';
+
+        // Definindo os cards com base no tipo de usuário
+        let cards = [];
+        if (isMotorista) {
+            cards = [
+                { title: 'Cadastrar Viatura', link: 'cadastro_viatura.html', icon: 'bx bx-car', class: 'card-1' },
+                { title: 'Adicionar Paragem', link: 'adicionar_paragem.html', icon: 'bx bx-map', class: 'card-2' },
+                { title: 'Pesquisar Viatura', link: 'pesquisar_viatura.html', icon: 'bx bx-search', class: 'card-3' },
+                { title: 'Ver Dados do Usuário', link: 'ver_dados_usuario.html', icon: 'bx bx-user', class: 'card-4' },
+                { title: 'Histórico de Paragens', link: 'historico_viatura.html', icon: 'bx bx-history', class: 'card-5' }
+            ];
+        } else {
+            // Usuário comum
+            cards = [
+                { title: 'Pesquisar Viatura', link: 'pesquisar_viatura.html', icon: 'bx bx-search', class: 'card-3' },
+                { title: 'Ver Dados do Usuário', link: 'ver_dados_usuario.html', icon: 'bx bx-user', class: 'card-4' },
+            ];
+        }
+
+        // Exibindo os cards na página
+        const cardContainer = document.getElementById('cardContainer');
+
+        cards.forEach(card => {
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card');
+            cardElement.classList.add(card.class);
+            cardElement.innerHTML = `
+                <a href="${card.link}">
+                    <i class='${card.icon}'></i>
+                    <p class="card-title">${card.title}</p>
+                </a>
+            `;
+            cardContainer.appendChild(cardElement);
+        });
+    </script>
+</body>
+</html>

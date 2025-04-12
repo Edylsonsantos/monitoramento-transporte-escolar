@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Paragens</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXziIbU_msVXwoHlXC8yOeHrdwsZTmD2E"></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Histórico de Paragens</h1>
+    <div id="map"></div>
+    <ul id="historico"></ul>
+
+    <script>
+        // Inicializa o mapa
+        function initMap() {
+            var quelimane = { lat: -17.878388, lng: 36.888273 };
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 13,
+                center: quelimane
+            });
+            return map;
+        }
+
+        let map = initMap();
+
+        // Função para adicionar marcadores no mapa
+        function addMarker(lat, lng, label) {
+            var marker = new google.maps.Marker({
+                position: { lat: parseFloat(lat), lng: parseFloat(lng) },
+                map: map,
+                title: label
+            });
+        }
+
+        // Obtém parâmetros da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const placa = urlParams.get('placa');
+        const empresa = urlParams.get('empresa');
+
+        // Busca viatura no localStorage
+        function buscarViatura(placa, empresa) {
+            let viaturas = JSON.parse(localStorage.getItem('viaturas')) || [];
+            
+            if (placa) {
+                return viaturas.find(v => v.placa === placa);
+            }
+            if (empresa) {
+                return viaturas.find(v => v.empresa === empresa);
+            }
+            return null;
+        }
+
+        // Exibe o histórico da viatura
+        let viatura = buscarViatura(placa, empresa);
+
+        if (viatura) {
+            let historicoUl = document.getElementById('historico');
+            viatura.historico.forEach(function(paragem) {
+                let li = document.createElement('li');
+                li.textContent = `Data: ${paragem.data}, Localização: (${paragem.latitude}, ${paragem.longitude})`;
+                historicoUl.appendChild(li);
+                addMarker(paragem.latitude, paragem.longitude, `Paragem em ${paragem.data}`);
+            });
+        } else {
+            alert('Viatura não encontrada!');
+        }
+    </script>
+</body>
+</html>

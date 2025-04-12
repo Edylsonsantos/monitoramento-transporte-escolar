@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Viatura</title>
+    <link rel="stylesheet" href="c_u.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXziIbU_msVXwoHlXC8yOeHrdwsZTmD2E"></script>
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: auto!important;
+            justify-items: center;
+        }
+        h1{
+            display: flex;
+            flex-direction: row-reverse;
+            text-align: left!important;
+            font-size: 16px!important;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Modal -->
+    <div id="myModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <i id="bx-car" class='bx bx-check-circle' style="display: none;"></i> <!-- Escondido por padrão -->
+            <i id="bx-x" class='bx bx-x' style="display: none;"></i> <!-- Escondido por padrão -->
+            <p id="message"></p>
+        </div>
+    </div>
+
+    <h1 class="underline-animation">Cadastrar Viatura</h1>
+    <form id="cadastroViaturaForm">
+        <div>
+            <label for="placa">Placa:</label>
+            <input type="text" id="placa" required>
+        </div>
+        <div>
+            <label for="nomeViatura">Nome da Viatura:</label>
+            <input type="text" id="nomeViatura" required>
+        </div>
+        <div>
+            <label for="proprietario">Nome do Proprietário:</label>
+            <input type="text" id="proprietario" required>
+        </div>
+        <div>
+            <label for="empresa">Nome da Empresa:</label>
+            <input type="text" id="empresa" required>
+        </div>
+        <button type="submit">Cadastrar Viatura</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const h1 = document.querySelector('.underline-animation');
+            h1.classList.add('start'); // Adiciona a classe para iniciar a animação
+        });
+
+        function openModal(icon, text) {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'flex';
+
+            const sucess = document.getElementById('bx-car');
+            const x = document.getElementById('bx-x');
+            const textMessage = document.getElementById('message');
+
+            if (icon === "success") {
+                sucess.style.display = "block"; // Mostra o ícone de sucesso
+                x.style.display = "none"; // Esconde o ícone de erro
+                textMessage.textContent = text; // Usa o texto passado como argumento
+            } else {
+                sucess.style.display = "none"; // Esconde o ícone de sucesso
+                x.style.display = "block"; // Mostra o ícone de erro
+                textMessage.textContent = text; // Usa o texto passado como argumento
+            }
+
+            // Fecha o modal após 3 segundos
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 3000);
+        }
+
+        document.getElementById('cadastroViaturaForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const viatura = {
+                placa: document.getElementById('placa').value,
+                nomeViatura: document.getElementById('nomeViatura').value,
+                proprietario: document.getElementById('proprietario').value,
+                empresa: document.getElementById('empresa').value,
+                historico: []
+            };
+
+            let viaturas = JSON.parse(localStorage.getItem('viaturas')) || [];
+            viaturas.push(viatura);
+            localStorage.setItem('viaturas', JSON.stringify(viaturas));
+
+            openModal("success", "Viatura cadastrada com sucesso!"); // Abre modal de sucesso
+            setTimeout(() => {
+                window.location.href = 'adicionar_paragem.html'; // Redireciona para adicionar paragem após 3 segundos
+            }, 3000); // Redireciona após 3 segundos
+        });
+    </script>
+</body>
+</html>

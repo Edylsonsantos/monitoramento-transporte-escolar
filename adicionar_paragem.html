@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Histórico de Paragem</title>
+    <link rel="stylesheet" href="c_u.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXziIbU_msVXwoHlXC8yOeHrdwsZTmD2E&callback=initMap" async defer></script>
+    <style>
+        body{
+            height: auto!important;
+        }
+        #map {
+            height: 300px; /* Altura do mapa */
+            width: 100%; /* Largura do mapa */
+            margin-bottom: 20px; /* Espaço abaixo do mapa */
+        }
+        h1, .underline-animation{
+            text-align: left!important;
+            font-size: 16px!important;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="underline-animation">Adicionar Histórico de Paragem</h1>
+    <form id="adicionarHistoricoForm">
+        <div>
+            <label for="placa">Placa da Viatura:</label>
+            <input type="text" id="placa" required>
+        </div>
+        <div>
+            <label for="data">Data:</label>
+            <input type="date" id="data" required>
+        </div>
+        <div>
+            <label for="hora">Hora:</label>
+            <input type="time" id="hora" required>
+        </div>
+        <div>
+            <label for="localizacao">Localização:</label>
+            <input type="text" id="localizacao" required readonly>
+        </div>
+        <div>
+            <button type="button" id="escolherLocalizacao" style="width: 100%;">Selecionar Localização no Mapa</button>
+        </div>
+        <div id="map"></div>
+        <button type="submit">Adicionar Histórico</button>
+    </form>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <i id="bx-car" class='bx bx-check-circle' style="display: none;"></i>
+            <i id="bx-x" class='bx bx-x' style="display: none;"></i>
+            <p id="message"></p>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let marker;
+
+        function initMap() {
+            // Configuração inicial do mapa
+            const mapOptions = {
+                zoom: 10,
+                center: { lat: -17.8800, lng: 36.8440 }, // Centraliza em Quelimane
+            };
+
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            // Evento de clique no mapa
+            map.addListener('click', function(event) {
+                placeMarker(event.latLng);
+            });
+        }
+
+        function placeMarker(location) {
+            // Remove o marcador anterior, se existir
+            if (marker) {
+                marker.setMap(null);
+            }
+            // Adiciona um novo marcador
+            marker = new google.maps.Marker({
+                position: location,
+                map: map
+            });
+            // Preenche o campo de localização com a latitude e longitude
+            document.getElementById('localizacao').value = `${location.lat()}, ${location.lng()}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const h1 = document.querySelector('.underline-animation');
+            h1.classList.add('start'); // Adiciona a classe para iniciar a animação
+        });
+
+        function openModal(icon, text) {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'flex';
+
+            const sucess = document.getElementById('bx-car');
+            const x = document.getElementById('bx-x');
+            const textMessage = document.getElementById('message');
+
+            if (icon === "success") {
+                sucess.style.display = "block"; // Mostra o ícone de sucesso
+                x.style.display = "none"; // Esconde o ícone de erro
+                textMessage.textContent = text; // Usa o texto passado como argumento
+            } else {
+                sucess.style.display = "none"; // Esconde o ícone de sucesso
+                x.style.display = "block"; // Mostra o ícone de erro
+                textMessage.textContent = text; // Usa o texto passado como argumento
+            }
+
+            // Fecha o modal após 3 segundos
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 3000);
+        }
+
+        document.getElementById('adicionarHistoricoForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const placa = document.getElementById('placa').value;
+            const data = document.getElementById('data').value;
+            const hora = document.getElementById('hora').value;
+            const localizacao = document.getElementById('localizacao').value;
+
+            // Obtém as viaturas do localStorage
+            let viaturas = JSON.parse(localStorage.getItem('viaturas')) || [];
+            const viatura = viaturas.find(v => v.placa === placa);
+
+            if (viatura) {
+                // Adiciona a nova paragem ao histórico da viatura
+                const novaParagem = {
+                    data: data,
+                    hora: hora,
+                    localizacao: localizacao
+                };
+                viatura.historico.push(novaParagem);
+                
+                // Atualiza o localStorage com a nova lista de viaturas
+                localStorage.setItem('viaturas', JSON.stringify(viaturas));
+                openModal("success", "Histórico adicionado com sucesso!"); // Abre modal de sucesso
+            } else {
+                openModal("error", "Viatura não encontrada."); // Abre modal de erro
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuário</title>
+    <link rel="stylesheet" href="c_u.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <i id="bx-car" class='bx bx-check-circle'></i>
+            <i id="bx-x" class='bx bx-x' style="display: none;"></i> <!-- Escondido por padrão -->
+            <p id="message"></p>
+        </div>
+    </div>
+
+    <h1 class="underline-animation">Faça seu cadastro para monitoramento</h1>
+
+    <form id="cadastroForm">
+        <div>
+            <label for="nome">Nome completo:</label>
+            <input type="text" id="nome" required>
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+        </div>
+        <div>
+            <label for="numero">Número de Telefone:</label>
+            <div style="display: flex;">
+                <input type="number" value="+258" disabled style="margin-right: 10px; width: 80px;">
+                <input type="number" id="numero" required inputmode="numeric" pattern="^\d{9}$" title="O número deve ter 9 dígitos.">
+            </div>
+        </div>
+        <div>
+            <label for="senha">Digite uma Senha:</label>
+            <input type="password" id="senha" required>
+        </div>
+        <div>
+            <label for="tipoUsuario">Tipo de usuário:</label>
+            <select id="tipoUsuario" required>
+                <option value="">Selecione</option>
+                <option value="motorista">Motorista</option>
+                <option value="usuario_comum">Encarregado de educação</option>
+            </select>
+        </div>
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <script>
+        function openModal(icon, text) {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'flex'; 
+
+            const sucess = document.getElementById('bx-car');
+            const x = document.getElementById('bx-x');
+            const textMessage = document.getElementById('message');
+
+            if (icon === "success") {
+                sucess.style.display = "block"; // Correção aqui
+                x.style.display = "none"; // Esconde o ícone de erro
+                textMessage.textContent = text; // Usa o texto passado como argumento
+            } else {
+                sucess.style.display = "none"; // Esconde o ícone de sucesso
+                x.style.display = "block"; // Mostra o ícone de erro
+                textMessage.textContent = "Ocorreu um erro ao registrar, tente de novo.";
+            }
+
+            // Fecha o modal após 8 segundos e redireciona
+            setTimeout(() => {
+                modal.style.display = 'none';
+                window.location.href = 'login.html';
+            }, 8000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const h1 = document.querySelector('.underline-animation');
+            h1.classList.add('start'); // Adiciona a classe para iniciar a animação
+        });
+
+        document.getElementById('cadastroForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Captura a data atual no formato YYYY-MM-DD
+            const dataCriacao = new Date().toISOString().split('T')[0];
+
+            const usuario = {
+                nome: document.getElementById('nome').value,
+                email: document.getElementById('email').value,
+                numero: document.getElementById('numero').value,
+                senha: document.getElementById('senha').value,
+                tipo: document.getElementById('tipoUsuario').value,
+                dataCriacao: dataCriacao
+            };
+
+            let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+            usuarios.push(usuario);
+            localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+            openModal("success", "Usuário cadastrado com sucesso, aguarde...");
+        });
+    </script>
+</body>
+</html>
